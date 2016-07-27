@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 android {
     compileSdkVersion 24
@@ -21,6 +23,32 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.1.1'
-    compile project(':common')
+    provided 'com.android.support:appcompat-v7:24.1.1'
+}
+// http://jeroenmols.com/blog/2015/08/06/artifactory/
+// http://stackoverflow.com/questions/27676838/how-to-publish-aar-file-to-apache-archiva-with-gradle
+task sourceJar(type: Jar) {
+    classifier "source"
+}
+
+publishing {
+    publications {
+        repositories.maven {
+            url 'myurl/repositories/myrepo'
+            credentials {
+                username "user"
+                password "password"
+            }
+        }
+
+        maven(MavenPublication) {
+            artifacts {
+                groupId 'com.mycompany'
+                artifactId 'mylibrary'
+                version '1.0'
+                artifact 'build/outputs/aar/app-release.aar'
+            }
+        }
+    }
+
 }
